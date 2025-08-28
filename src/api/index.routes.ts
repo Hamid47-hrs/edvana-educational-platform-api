@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { getAPIStatus } from "../controllers/index.controller";
+import userRoutes from "./user.routes";
 import AppError from "../utils/AppError";
 
 const router = Router();
@@ -13,5 +14,7 @@ router.get("/error", (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
+
+router.use("/users", userRoutes);
 
 export default router;
