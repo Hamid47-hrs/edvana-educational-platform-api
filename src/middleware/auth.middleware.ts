@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient, Role } from "../generated/prisma";
 import AppError from "../utils/AppError";
 
 const prisma = new PrismaClient();
@@ -39,8 +39,23 @@ export const protect = async (
         "The user belonging to this token no longer exists!"
       );
     }
+
+    (req as any).user = currentUser;
+
     next();
   } catch (error) {
     next(new AppError(401, "Invalid token or session expired!"));
   }
+};
+
+export const restrictTo = (...roles: Role[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!(req as any).user || !roles.includes((req as any).user.role)) {
+      throw new AppError(
+        403,
+        "You do not have the permission to perform this action"
+      );
+    }
+    next();
+  };
 };

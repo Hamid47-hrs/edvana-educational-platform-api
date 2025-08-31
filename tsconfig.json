@@ -6,7 +6,15 @@
         "rootDir": "./src", /* Specify the root directory of input files */
         "strict": true, /* Enable all strict type-checking options */
         "esModuleInterop": true, /* Enables compatibility with CommonJS modules */
+        "typeRoots": [
+            "./node_modules/@types",
+            "./types"
+        ],
         "skipLibCheck": true, /* Skip type checking of declaration files */
         "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
-    }
+    },
+    "include": [
+        "src/**/*.ts",
+        "types/express/index.d.ts"
+    ]
 }
