@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "../generated/prisma";
+import AppError from "../utils/AppError";
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,95 @@ export const createCourse = async (
       },
     });
 
-    res.status(201).json({ status: "success.", data: { course: newCourse } });
+    res.status(201).json({ status: "Success.", data: { course: newCourse } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllCourses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const courses = await prisma.course.findMany();
+
+    res.status(200).json({
+      status: "Success.",
+      result: courses.length,
+      data: {
+        courses,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCourseById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const course = await prisma.course.findUnique({ where: { id } });
+
+    if (!course) {
+      throw new AppError(404, "There is no course with that ID.");
+    }
+
+    res.status(200).json({
+      status: "Success.",
+      data: {
+        course,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    const course = await prisma.course.findUnique({ where: { id } });
+
+    if (!course) {
+      throw new AppError(404, "There is no course with that ID.");
+    }
+
+    if (
+      (req as any).user.role !== "ADMIN" &&
+      course.teacherId !== (req as any).user.id
+    ) {
+      throw new AppError(
+        403,
+        "You do not have permission to update this course."
+      );
+    }
+
+    const updatedCourse = await prisma.course.update({
+      where: { id },
+      data: {
+        title,
+        description,
+      },
+    });
+
+    res.status(200).json({
+      status: "Success.",
+      data: {
+        course: updatedCourse,
+      },
+    });
   } catch (error) {
     next(error);
   }
