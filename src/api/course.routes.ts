@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { protect } from "../middleware/auth.middleware";
 import { restrictTo } from "../middleware/auth.middleware";
+import { validateCourseUpdate } from "../middleware/course.validators";
 import {
   createCourse,
   getAllCourses,
@@ -18,6 +19,6 @@ router.use(protect);
 
 // --- Private Routes for "ADMIN" & "TEACHER" ---
 router.route("/").post(restrictTo("ADMIN", "TEACHER"), createCourse);
-router.route("/:id").patch(updateCourse);
+router.route("/:id").patch(validateCourseUpdate, updateCourse);
 
 export default router;
