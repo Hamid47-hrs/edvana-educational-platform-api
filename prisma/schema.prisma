@@ -29,7 +29,8 @@ model User {
   role Role @default(STUDENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  courses Course[]
+  courses Course[] @relation("TeacherCourses")
+  enrolledCourses Course[] @relation("StudentEnrollments")
 }
 
 model Course {
@@ -39,7 +40,8 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   teacherId String
-  teacher User @relation(fields:[teacherId],references:[id])
+  teacher User @relation("TeacherCourses",fields:[teacherId],references:[id])
+  students User[] @relation("StudentEnrollments")
   lessons Lesson[]
 }
 

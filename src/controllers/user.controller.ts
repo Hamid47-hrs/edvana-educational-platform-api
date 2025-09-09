@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import e, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "../generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -70,6 +70,34 @@ export const loginUser = async (
     res.status(200).json({
       status: "Success.",
       token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyEnrolledCourses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const studentId = (req as any).user.id;
+
+    const userWithCourses = await prisma.user.findUnique({
+      where: { id: studentId },
+      include: {
+        enrolledCourses: true,
+      },
+    });
+
+    if (!userWithCourses) {
+      throw new AppError(404, "User not found.");
+    }
+
+    res.status(200).json({
+      status: "Seccess.",
+      data: { courses: userWithCourses.enrolledCourses },
     });
   } catch (error) {
     next(error);

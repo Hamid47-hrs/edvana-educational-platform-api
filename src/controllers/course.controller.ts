@@ -149,3 +149,32 @@ export const deleteCourse = async (
     next(error);
   }
 };
+
+export const enrollInCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { courseId } = req.params;
+    const studentId = (req as any).user.id;
+
+    await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        students: {
+          connect: {
+            id: studentId,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: "Success.",
+      message: "Successfully enrolled in the course.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

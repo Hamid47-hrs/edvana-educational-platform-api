@@ -5,6 +5,7 @@ import { validateCourseUpdate } from "../middleware/course.validators";
 import {
   createCourse,
   deleteCourse,
+  enrollInCourse,
   getAllCourses,
   getCourseById,
   updateCourse,
@@ -24,5 +25,9 @@ router
   .route("/:id")
   .patch(validateCourseUpdate, updateCourse)
   .delete(deleteCourse);
+
+router
+  .route("/:courseId/enroll")
+  .post(protect, restrictTo("STUDENT"), enrollInCourse);
 
 export default router;
