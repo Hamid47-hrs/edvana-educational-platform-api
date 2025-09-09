@@ -117,3 +117,35 @@ export const updateCourse = async (
     next(error);
   }
 };
+
+export const deleteCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    const course = await prisma.course.findUnique({ where: { id } });
+
+    if (!course) {
+      throw new AppError(404, "There is no course with that ID.");
+    }
+
+    if (
+      (req as any).user.role !== "ADMIN" &&
+      course.teacherId !== (req as any).user.id
+    ) {
+      throw new AppError(
+        403,
+        "You do not have permission to delete this course."
+      );
+    }
+
+    await prisma.course.delete({ where: { id } });
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};

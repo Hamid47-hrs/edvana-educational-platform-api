@@ -4,6 +4,7 @@ import { restrictTo } from "../middleware/auth.middleware";
 import { validateCourseUpdate } from "../middleware/course.validators";
 import {
   createCourse,
+  deleteCourse,
   getAllCourses,
   getCourseById,
   updateCourse,
@@ -19,6 +20,9 @@ router.use(protect);
 
 // --- Private Routes for "ADMIN" & "TEACHER" ---
 router.route("/").post(restrictTo("ADMIN", "TEACHER"), createCourse);
-router.route("/:id").patch(validateCourseUpdate, updateCourse);
+router
+  .route("/:id")
+  .patch(validateCourseUpdate, updateCourse)
+  .delete(deleteCourse);
 
 export default router;
