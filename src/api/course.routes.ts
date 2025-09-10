@@ -8,6 +8,7 @@ import {
   enrollInCourse,
   getAllCourses,
   getCourseById,
+  getLessonsForCourse,
   updateCourse,
 } from "../controllers/course.controller";
 
@@ -23,11 +24,10 @@ router.use(protect);
 router.route("/").post(restrictTo("ADMIN", "TEACHER"), createCourse);
 router
   .route("/:id")
-  .patch(validateCourseUpdate, updateCourse)
-  .delete(deleteCourse);
+  .patch(restrictTo("ADMIN", "TEACHER"), validateCourseUpdate, updateCourse)
+  .delete(restrictTo("ADMIN", "TEACHER"), deleteCourse);
 
-router
-  .route("/:courseId/enroll")
-  .post(protect, restrictTo("STUDENT"), enrollInCourse);
+router.route("/:courseId/enroll").post(restrictTo("STUDENT"), enrollInCourse);
+router.route("/:courseId/lessons").get(getLessonsForCourse);
 
 export default router;

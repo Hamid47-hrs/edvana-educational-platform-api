@@ -178,3 +178,40 @@ export const enrollInCourse = async (
     next(error);
   }
 };
+
+export const getLessonsForCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { courseId } = req.params;
+    const userId = (req as any).user.id;
+
+    const enrollment = await prisma.course.findFirst({
+      where: {
+        id: courseId,
+        students: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (!enrollment && (req as any).user.role !== "ADMIN") {
+      throw new AppError(403, "You are not enrolled in this course.");
+    }
+
+    const lessons = await prisma.lesson.findMany({
+      where: { courseId },
+    });
+
+    res.status(200).json({
+      status: "Success.",
+      data: { lessons },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

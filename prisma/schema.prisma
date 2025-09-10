@@ -31,6 +31,7 @@ model User {
   updatedAt DateTime @updatedAt
   courses Course[] @relation("TeacherCourses")
   enrolledCourses Course[] @relation("StudentEnrollments")
+  lessonCompletions LessonCompletion[]
 }
 
 model Course {
@@ -53,4 +54,15 @@ model Lesson {
   updatedAt DateTime @updatedAt
   courseId String
   course Course @relation(fields:[courseId], references: [id])
+  completions LessonCompletion[]
+}
+
+model LessonCompletion {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  studentId String
+  lessonId String
+  student User @relation(fields: [studentId], references: [id])
+  lesson Lesson @relation(fields: [lessonId],references: [id])
+  @@unique([studentId, lessonId])
 }
