@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "../generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -70,6 +70,27 @@ export const loginUser = async (
     res.status(200).json({
       status: "Success.",
       token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userProfile = (req as any).user;
+
+    const { password, ...profileWithoutPassword } = userProfile!;
+
+    res.status(200).json({
+      status: 200,
+      data: {
+        user: profileWithoutPassword,
+      },
     });
   } catch (error) {
     next(error);
