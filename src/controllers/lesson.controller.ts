@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { PrismaClient } from "../generated/prisma";
+import prisma from "../config/prismaClient";
 import AppError from "../utils/AppError";
-
-const prisma = new PrismaClient();
 
 export const markLessonAsComplete = async (
   req: Request,

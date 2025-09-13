@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "../generated/prisma";
+import prisma from "../config/prismaClient";
 import AppError from "../utils/AppError";
-
-const prisma = new PrismaClient();
 
 export const createCourse = async (
   req: Request,
