@@ -6,4 +6,3 @@ node_modules
 
 # Compiled TypeScript
 dist
-/src/generated/prisma

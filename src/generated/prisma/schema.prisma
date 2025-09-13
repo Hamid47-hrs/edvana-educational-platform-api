@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enum for user roles
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+// Define the User model
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  name              String?
+  password          String
+  role              Role               @default(STUDENT)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  courses           Course[]           @relation("TeacherCourses")
+  enrolledCourses   Course[]           @relation("StudentEnrollments")
+  lessonCompletions LessonCompletion[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  teacherId   String
+  teacher     User     @relation("TeacherCourses", fields: [teacherId], references: [id])
+  students    User[]   @relation("StudentEnrollments")
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String             @id @default(cuid())
+  title       String
+  content     String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  courseId    String
+  course      Course             @relation(fields: [courseId], references: [id])
+  completions LessonCompletion[]
+}
+
+model LessonCompletion {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  studentId String
+  lessonId  String
+  student   User     @relation(fields: [studentId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+
+  @@unique([studentId, lessonId])
+}
